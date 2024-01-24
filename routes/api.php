@@ -17,13 +17,13 @@ use App\Http\Controllers\Auth\LoginRegisterController;
 
 // Rutas publicas para acceder o registrar una cuenta
 Route::controller(LoginRegisterController::class)->group(function() {
-    Route::post('/register', 'register');
-    Route::post('/login', 'login');
+    Route::post('/local/auth/register', 'register');
+    Route::post('/local/auth/login', 'login');
 });
 
 // Protected routes of product and logout
 Route::middleware('auth:sanctum')->group( function () {
-    Route::post('/logout', [LoginRegisterController::class, 'logout']);
+    Route::post('/local/auth/logout', [LoginRegisterController::class, 'logout']);
 
     // Rutas en las que se realiozará todas las operaciones siempre y cuenado el usuario este logueado
 });
