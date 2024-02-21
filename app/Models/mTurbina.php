@@ -9,7 +9,7 @@ class mTurbina extends Model
 {
     use HasFactory;
 
-    protected $table = "m_turbinas";
+    protected $table = "medidor_turbina";
 
     protected $fillable = [ 
         'modelo_equipo', 

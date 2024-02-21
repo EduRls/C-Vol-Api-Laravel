@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('m_turbinas', function (Blueprint $table) {
+        Schema::create('medidor_turbina', function (Blueprint $table) {
             $table->id();
             $table->string('modelo_equipo', 100);
-            $table->string('rango_flujo', 100);
-            $table->string('rango_temperatura', 100);
-            $table->string('numero_serie', 100);
-            $table->string('precision');
-            $table->string('suministro_energia');
-            $table->string('salida_modelo');
-            $table->string('fecha');
+            $table->string('rango_flujo', 45);
+            $table->string('rango_temperatura', 45);
+            $table->string('numero_serie', 45);
+            $table->string('precision', 100);
+            $table->string('suministro_energia', 45);
+            $table->string('salida_modelo', 45);
+            $table->datetime('fecha');
             $table->timestamps();
         });
     }
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('m_turbinas');
+        Schema::dropIfExists('medidor_turbina');
     }
 };
