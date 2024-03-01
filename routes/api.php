@@ -85,4 +85,6 @@ Route::middleware('auth:sanctum')->group( function () {
         Route::post('/v1/entrada-salida-pipa/registro/{id}', 'update');
         Route::delete('/v1/entrada-salida-pipa/registro/{id}', 'destroy'); 
     });
+
+    // Solicitud de información del medidor
 });

@@ -90,4 +90,9 @@ class MTurbinaController extends Controller
             return response()->json([ 'error' => $th->getMessage()], 500);
         }
     }
+
+    public function getInformacion(mTurbina $mTurbina)
+    {
+        
+    }
 }
