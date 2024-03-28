@@ -9,7 +9,7 @@ class RegistroEntradasSalidasPipa extends Model
 {
     use HasFactory;
 
-    protected $table = "registro";
+    protected $table = "registro_entradas_salidas_pipa";
 
     protected $fillable = [
         "inventario_inical",

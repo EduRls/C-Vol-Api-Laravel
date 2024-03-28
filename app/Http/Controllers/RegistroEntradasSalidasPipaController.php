@@ -31,7 +31,7 @@ class RegistroEntradasSalidasPipaController extends Controller
             $data["venta"] = $request["venta"];
             $data["inventario_final"] = $request["inventario_final"];
 
-            $res = RegistroEntradasSalidas::create($data);
+            $res = RegistroEntradasSalidasPipa::create($data);
             return response()->json($res, 200);
         } catch (\Throwable $th) {
             return response()->json(['error' => $th->getMessage()], 500);
@@ -63,8 +63,8 @@ class RegistroEntradasSalidasPipaController extends Controller
             $data["venta"] = $request["venta"];
             $data["inventario_final"] = $request["inventario_final"];
 
-            RegistroEntradasSalidasPipa::find($id)->update($data);
-            $res = RegistroEntradasSalidasPipa::find($id);
+            RegistroEntradasSalidasPipa::find($request->id)->update($data);
+            $res = RegistroEntradasSalidasPipa::find($request->id);
             return  response()->json($res, 200);
         } catch (\Throwable $th) {
             return response()->json(['error' => $th->getMessage()], 500);
@@ -74,10 +74,10 @@ class RegistroEntradasSalidasPipaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(RegistroEntradasSalidasPipa $registroEntradasSalidasPipa)
+    public function destroy(Request $request, RegistroEntradasSalidasPipa $registroEntradasSalidasPipa)
     {
         try {
-            $res = RegistroEntradasSalidasPipa::find($id)->delete();
+            $res = RegistroEntradasSalidasPipa::find($request->id)->delete();
             return response()->json(["deleted" => $res], 200);
         } catch (\Throwable $th) {
             return response()->json([ 'error' => $th->getMessage()], 500);
