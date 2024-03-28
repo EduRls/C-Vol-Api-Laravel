@@ -60,8 +60,8 @@ class PipaController extends Controller
             $data["capacidad_pipa"] = $request["capacidad_pipa"];
             $data["clave_pipa"] = $request["clave_pipa"];
 
-            Pipa::find($id)->update($data);
-            $res = Pipa::find($id);
+            Pipa::find($request->id)->update($data);
+            $res = Pipa::find($request->id);
             return response()->json($res, 200);
         } catch (\Throwable $th) {
             return response()->json([ 'error' => $th->getMessage() ], 500);
@@ -71,10 +71,10 @@ class PipaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Pipa $pipa)
+    public function destroy(Request $request, Pipa $pipa)
     {
         try {
-            $res = Pipa::find($id)->delete();
+            $res = Pipa::find($request->id)->delete();
             return response()->json(["deleted" => $res], 200);
         } catch (\Throwable $th) {
             return response()->json(["error" => $th->getMessage()], 500);
