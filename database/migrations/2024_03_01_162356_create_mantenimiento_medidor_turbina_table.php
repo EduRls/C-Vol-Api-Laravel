@@ -21,7 +21,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Llave foranea a los medidores
-            $table->foreign('id_medidor')->references('id')->on('medidor_turbina')->onDelete('NO ACTION');
+            $table->foreign('id_medidor')->references('id')->on('medidor_turbina');
         });
     }
 

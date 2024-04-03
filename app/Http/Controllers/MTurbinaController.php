@@ -45,10 +45,10 @@ class MTurbinaController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(mTurbina $mTurbina)
+    public function show(Request $request,mTurbina $mTurbina)
     {
         try { 
-            $data = mTurbina::find($id);
+            $data = mTurbina::find($request->id);
             return response()->json($data, 200);
         } catch (\Throwable $th) {
             return response()->json([ 'error' => $th->getMessage()], 500);
@@ -70,8 +70,8 @@ class MTurbinaController extends Controller
             $data['salida_modelo'] = $request['salida_modelo'];
             $data['fecha'] = $request['fecha'];
 
-            mTurbina::find($id)->update($data);
-            $res = mTurbina::find($id);
+            mTurbina::find($request->id)->update($data);
+            $res = mTurbina::find($request->id);
             return response()->json( $res , 200);
         } catch (\Throwable $th) {
             return response()->json([ 'error' => $th->getMessage()], 500);
@@ -81,10 +81,10 @@ class MTurbinaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(mTurbina $mTurbina)
+    public function destroy(Request $request, mTurbina $mTurbina)
     {
         try {       
-            $res = mTurbina::find($id)->delete(); 
+            $res = mTurbina::find($request->id)->delete(); 
             return response()->json([ "deleted" => $res ], 200);
         } catch (\Throwable $th) {
             return response()->json([ 'error' => $th->getMessage()], 500);

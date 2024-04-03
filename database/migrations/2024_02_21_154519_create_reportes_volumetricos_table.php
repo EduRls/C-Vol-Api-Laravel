@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('reportes_volumetricos', function (Blueprint $table) {
             $table->id();
             $table->json('reporte');
+            $table->string('tipo');
             $table->timestamps();
         });
     }

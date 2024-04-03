@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('precision', 100);
             $table->string('suministro_energia', 45);
             $table->string('salida_modelo', 45);
-            $table->datetime('fecha');
+            $table->string('fecha', 50);
             $table->timestamps();
         });
     }

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Foreign key constraint
-            $table->foreign('id_medidor')->references('id')->on('medidor_turbina')->onDelete('NO ACTION');
+            $table->foreign('id_medidor')->references('id')->on('medidor_turbina');
         });
     }
 

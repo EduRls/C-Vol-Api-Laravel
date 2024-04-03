@@ -9,6 +9,9 @@ use App\Http\Controllers\PipaController;
 use App\Http\Controllers\RegistroLlenadoAlmacenController;
 use App\Http\Controllers\ReporteVolumetrico;
 use App\Http\Controllers\RegistroEntradasSalidasPipaController;
+use App\Http\Controllers\MantenimientoMTurbinaController;
+use App\Http\Controllers\InformacionMedidorController;
+use App\Http\Controllers\InformacionGeneralReporteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -86,5 +89,30 @@ Route::middleware('auth:sanctum')->group( function () {
         Route::delete('/v1/entrada-salida-pipa/registro/{id}', 'destroy'); 
     });
 
-    // Solicitud de información del medidor
+    //Registro de mantetnimiento del medidor
+    Route::controller(MantenimientoMTurbinaController::class)->group(function(){
+        Route::get('/v1/equipo/mantenimiento', 'index');
+        Route::get('/v1/equipo/mantenimiento/{id}', 'show');
+        Route::post('/v1/equipo/mantenimiento', 'store');
+        Route::post('/v1/equipo/mantenimiento/{id}', 'update');
+        Route::delete('/v1/equipo/mantenimiento/{id}', 'destroy'); 
+    });
+
+    //Registro de historial infromaicón del medidor
+    Route::controller(InformacionMedidorController::class)->group(function(){
+        Route::get('/v1/medidorT/informacion', 'index');
+        Route::get('/v1/medidorT/informacion/{id}', 'show');
+        Route::post('/v1/medidorT/informacion', 'store');
+        Route::post('/v1/medidorT/informacion/{id}', 'update');
+        Route::delete('/v1/medidorT/informacion/{id}', 'destroy'); 
+    });
+
+    //Registro Información Generar del reporte
+    Route::controller(InformacionGeneralReporteController::class)->group(function() {
+        Route::get('/v1/reporte/informacion-general', 'index');
+        Route::get('/v1/reporte/informacion-general/{id}', 'show');
+        Route::post('/v1/reporte/informacion-generala', 'store');
+        Route::post('/v1/reporte/informacion-general/{id}', 'update');
+        Route::delete('/v1/reporte/informacion-general/{id}', 'destroy');
+    });
 });
