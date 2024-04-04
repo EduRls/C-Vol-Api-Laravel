@@ -14,14 +14,15 @@ return new class extends Migration
         Schema::create('mantenimiento_medidor_turbina', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('id_medidor')->unsigned();
+            $table->foreign('id_medidor')->references('id')->on('medidor_turbina')->onDelete('no action');
+            $table->bigInteger('id_planta')->unsigned();
+            $table->foreign('id_planta')->references('id')->on('planta_gas')->onDelete('no action');
             $table->string('tipo_mantenimiento')->nullable(false);
             $table->string('responsable')->nullable(false);
             $table->string('estado')->nullable(false);
             $table->string('observaciones')->nullable(false);
             $table->timestamps();
-
-            // Llave foranea a los medidores
-            $table->foreign('id_medidor')->references('id')->on('medidor_turbina');
+            $table->softDeletes();         
         });
     }
 

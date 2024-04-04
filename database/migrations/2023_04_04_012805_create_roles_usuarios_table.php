@@ -11,14 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('reportes_volumetricos', function (Blueprint $table) {
+        Schema::create('roles_usuarios', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('id_planta')->unsigned();
-            $table->json('reporte');
-            $table->string('tipo');
+            $table->string('rol');
             $table->timestamps();
             $table->softDeletes();  
-            $table->foreign('id_planta')->references('id')->on('planta_gas')->onDelete('no action');
         });
     }
 
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('reportes_volumetricos');
+        Schema::dropIfExists('roles_usuarios');
     }
 };

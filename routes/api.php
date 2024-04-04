@@ -12,7 +12,7 @@ use App\Http\Controllers\RegistroEntradasSalidasPipaController;
 use App\Http\Controllers\MantenimientoMTurbinaController;
 use App\Http\Controllers\InformacionMedidorController;
 use App\Http\Controllers\InformacionGeneralReporteController;
-
+use App\Http\Controllers\GenReporteVolumetricoController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -109,10 +109,15 @@ Route::middleware('auth:sanctum')->group( function () {
 
     //Registro Información Generar del reporte
     Route::controller(InformacionGeneralReporteController::class)->group(function() {
-        Route::get('/v1/reporte/informacion-general', 'index');
-        Route::get('/v1/reporte/informacion-general/{id}', 'show');
-        Route::post('/v1/reporte/informacion-generala', 'store');
-        Route::post('/v1/reporte/informacion-general/{id}', 'update');
-        Route::delete('/v1/reporte/informacion-general/{id}', 'destroy');
+        Route::get('/v1/reporteVolumetrico/informacion-general', 'index');
+        Route::get('/v1/reporteVolumetrico/informacion-general/{id}', 'show');
+        Route::post('/v1/reporteVolumetrico/informacion-generala', 'store');
+        Route::post('/v1/reporteVolumetrico/informacion-general/{id}', 'update');
+        Route::delete('/v1/reporteVolumetrico/informacion-general/{id}', 'destroy');
+    });
+
+    
+    Route::controller(GenReporteVolumetricoController::class)->group(function() {
+        Route::get('/v1/generar-reporte', 'generarReporte');
     });
 });

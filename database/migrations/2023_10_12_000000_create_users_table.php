@@ -14,11 +14,17 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->bigInteger('id_planta')->unsigned()->nullable();
+            $table->bigInteger('id_rol_usuario')->unsigned()->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
+
+            // Foreign key constraint
+            $table->foreign('id_planta')->references('id')->on('planta_gas')->onDelete('no action');
+            $table->foreign('id_rol_usuario')->references('id')->on('roles_usuarios')->onDelete('no action');
         });
     }
 

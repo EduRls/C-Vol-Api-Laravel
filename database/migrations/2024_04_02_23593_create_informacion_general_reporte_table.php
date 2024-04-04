@@ -13,11 +13,13 @@ return new class extends Migration
     {
         Schema::create('informacion_general_reporte', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('id_planta')->unsigned();
+            $table->foreign('id_planta')->references('id')->on('planta_gas');
             // RFCs
             $table->string('rfc_contribuyente', 13)->nullable();
             $table->string('rfc_representante_legal', 13)->nullable();
             $table->string('rfc_proveedor', 13)->nullable();
-            $table->json('ref_proveedores')->nullable();
+            $table->json('rfc_proveedores')->nullable();
             
             // Características Generales
             $table->string('tipo_caracter')->nullable();
@@ -40,6 +42,7 @@ return new class extends Migration
             $table->integer('numero_dispensarios')->nullable();
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

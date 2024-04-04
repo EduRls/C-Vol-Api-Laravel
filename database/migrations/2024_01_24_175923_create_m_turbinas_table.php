@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('medidor_turbina', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('id_planta')->unsigned();
             $table->string('modelo_equipo', 100);
             $table->string('rango_flujo', 45);
             $table->string('rango_temperatura', 45);
@@ -21,7 +22,10 @@ return new class extends Migration
             $table->string('suministro_energia', 45);
             $table->string('salida_modelo', 45);
             $table->string('fecha', 50);
-            $table->timestamps();
+            $table->timestamps();  
+            
+            $table->foreign('id_planta')->references('id')->on('planta_gas');
+            $table->softDeletes();
         });
     }
 
