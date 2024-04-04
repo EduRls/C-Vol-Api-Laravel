@@ -12,6 +12,7 @@ class Pipa extends Model
     protected $table = "pipa";
 
     protected $fillable = [
+        'id_planta',
         "responsable_pipa",
         "capacidad_pipa",
         "clave_pipa"

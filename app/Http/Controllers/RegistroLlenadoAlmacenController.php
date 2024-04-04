@@ -10,10 +10,10 @@ class RegistroLlenadoAlmacenController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index($idPlanta)
     {
         try {
-            $data = RegistroLlenadoAlmacen::get();
+            $data = RegistroLlenadoAlmacen::where('id_planta', $idPlanta)->get();
             return response()->json($data, 200);
         } catch (\Throwable $th) {
             return response()->json([ 'error' => $th->getMessage() ], 500);
@@ -58,6 +58,7 @@ class RegistroLlenadoAlmacenController extends Controller
     public function update(Request $request, RegistroLlenadoAlmacen $registroLlenadoAlmacen)
     {
         try {
+            $data['id_planta'] = $request['id_planta'];
             $data["nombre_contenedor"] = $request["nombre_contenedor"];
             $data["cantidad_inical"] = $request["cantidad_inical"];
             $data["cantidad_final"] = $request["cantidad_final"];

@@ -10,10 +10,10 @@ class MantenimientoMTurbinaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index($idPlanta)
     {
         try {
-            $data = MantenimientoMTurbina::get();
+            $data = MantenimientoMTurbina::where('id_planta', $idPlanta)->get();
             return response()->json($data, 200);
         } catch (\Throwable $th) {
             return response()->json([ 'error' => $th->getMessage() ], 501);
@@ -26,6 +26,7 @@ class MantenimientoMTurbinaController extends Controller
     public function store(Request $request)
     {
         try {
+            $data['id_planta'] = $request['id_planta'];
             $data["id_medidor"] = $request["id_medidor"];
             $data["tipo_mantenimiento"] = $request["tipo_mantenimiento"];
             $data["responsable"] = $request["responsable"];

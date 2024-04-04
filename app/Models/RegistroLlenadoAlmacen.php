@@ -12,6 +12,7 @@ class RegistroLlenadoAlmacen extends Model
     protected $table = "registro_llenado_almacen";
 
     protected $fillable = [
+        'id_planta',
         "nombre_contenedor",
         "cantidad_inical",
         "cantidad_final",

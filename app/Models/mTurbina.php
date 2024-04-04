@@ -11,7 +11,8 @@ class mTurbina extends Model
 
     protected $table = "medidor_turbina";
 
-    protected $fillable = [ 
+    protected $fillable = [
+        'id_planta',
         'modelo_equipo', 
         'rango_flujo',
         'rango_temperatura',

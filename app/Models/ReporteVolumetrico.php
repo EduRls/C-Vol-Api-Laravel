@@ -12,6 +12,7 @@ class ReporteVolumetrico extends Model
     protected $table = "reportes_volumetricos";
 
     protected $fillable = [
+        'id_planta',
         "reporte"
     ];
 }

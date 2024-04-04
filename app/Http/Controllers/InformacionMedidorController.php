@@ -10,10 +10,10 @@ class InformacionMedidorController extends Controller
      /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index($idPlanta)
     {
         try {
-            $data = InformacionMedidor::get();
+            $data = InformacionMedidor::where('id_planta', $idPlanta)->get();
             return response()->json($data, 200);
         } catch (\Throwable $th) {
             return response()->json([ 'error' => $th->getMessage() ], 501);
@@ -56,6 +56,7 @@ class InformacionMedidorController extends Controller
     public function update(Request $request, InformacionMedidor $informacionMedidor)
     {
         try {
+            $data['id_planta'] = $request['id_planta'];
             $data["id_medidor"] = $request["id_medidor"];
             $data["informacion_medidor"] = $request["informacion_medidor"];
 

@@ -10,10 +10,10 @@ class MTurbinaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index($idPlanta)
     {
         try { 
-            $data = mTurbina::get();
+            $data = mTurbina::where('id_planta', $idPlanta)->get();
             return response()->json($data, 200);
         } catch (\Throwable $th) {
             return response()->json([ 'error' => $th->getMessage()], 500);
@@ -60,7 +60,8 @@ class MTurbinaController extends Controller
      */
     public function update(Request $request, mTurbina $mTurbina)
     {
-        try { 
+        try {
+            $data['id_planta'] = $request['id_planta'];
             $data['modelo_equipo'] = $request['modelo_equipo'];
             $data['rango_flujo'] = $request['rango_flujo'];
             $data['rango_temperatura'] = $request['rango_temperatura'];

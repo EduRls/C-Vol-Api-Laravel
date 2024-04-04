@@ -12,6 +12,7 @@ class MantenimientoMTurbina extends Model
     protected $table = "mantenimiento_medidor_turbina";
 
     protected $fillable = [ 
+        'id_planta',
         'id_medidor', 
         'tipo_mantenimiento',
         'responsable',

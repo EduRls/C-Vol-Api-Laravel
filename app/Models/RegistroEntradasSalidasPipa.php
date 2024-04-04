@@ -12,6 +12,7 @@ class RegistroEntradasSalidasPipa extends Model
     protected $table = "registro_entradas_salidas_pipa";
 
     protected $fillable = [
+        'id_planta',
         "inventario_inical",
         "compra",
         "venta",

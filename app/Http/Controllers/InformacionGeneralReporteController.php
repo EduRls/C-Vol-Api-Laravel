@@ -10,10 +10,10 @@ class InformacionGeneralReporteController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index($idPlanta)
     {
         try {
-            $data = InformacionGeneralReporte::get();
+            $data = InformacionGeneralReporte::where('id_planta', $idPlanta)->get();
             return response()->json($data, 200);
         } catch (\Throwable $th) {
             return response()->json(['error' => $th->getMessage()], 500);
@@ -26,6 +26,7 @@ class InformacionGeneralReporteController extends Controller
     public function store(Request $request)
     {
         try {
+            $data['id_planta'] = $request['id_planta'];
             $data['rfc_contribuyente'] = $request['rfc_contribuyente'];
             $data['rfc_representante_legal'] = $request['rfc_representante_legal'];
             $data['rfc_proveedor'] = $request['rfc_proveedor'];

@@ -10,10 +10,10 @@ class ReporteVolumetricoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index($idPlanta)
     {
         try {
-            $data = ReporteVolumetrico::get();
+            $data = ReporteVolumetrico::where('id_planta', $idPlanta)->get();
             return response()->json($data, 200);
         } catch (\Throwable $th) {
             return response()->json([ "error" => $th->getMessage() ], 500);
@@ -26,6 +26,7 @@ class ReporteVolumetricoController extends Controller
     public function store(Request $request)
     {
         try {
+            $data['id_planta'] = $request['id_planta'];
             $data['reporte'] = $request['reporte'];
 
             $res = ReporteVolumetrico::create($data);
