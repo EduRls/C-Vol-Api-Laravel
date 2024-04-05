@@ -74,6 +74,7 @@ class InformacionGeneralReporteController extends Controller
     public function update(Request $request, $id)
     {
         try {
+            $data['id_planta'] = $request['id_planta'];
             $data['rfc_contribuyente'] = $request['rfc_contribuyente'];
             $data['rfc_representante_legal'] = $request['rfc_representante_legal'];
             $data['rfc_proveedor'] = $request['rfc_proveedor'];

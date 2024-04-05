@@ -26,6 +26,7 @@ class MTurbinaController extends Controller
     public function store(Request $request)
     {
         try {
+            $data['id_planta'] = $request['id_planta'];
             $data['modelo_equipo'] = $request['modelo_equipo'];
             $data['rango_flujo'] = $request['rango_flujo'];
             $data['rango_temperatura'] = $request['rango_temperatura'];

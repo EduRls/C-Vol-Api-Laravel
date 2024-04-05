@@ -59,6 +59,7 @@ class RegistroEntradasSalidasPipaController extends Controller
     public function update(Request $request, RegistroEntradasSalidasPipa $registroEntradasSalidasPipa)
     {
         try {
+            $data['id_planta'] = $request['id_planta'];
             $data["inventario_inical"] = $request["inventario_inical"];
             $data["compra"] = $request["compra"];
             $data["venta"] = $request["venta"];

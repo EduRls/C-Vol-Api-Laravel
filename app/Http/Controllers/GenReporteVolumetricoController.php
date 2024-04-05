@@ -10,7 +10,7 @@ class GenReporteVolumetricoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function generarReporte()
+    public function generarReporte($idPlanta)
     {
         date_default_timezone_set('America/Mexico_City');
 
@@ -21,7 +21,7 @@ class GenReporteVolumetricoController extends Controller
 
         
         try {
-            $dataReporteGeneral = InformacionGeneralReporte::get();
+            $dataReporteGeneral = InformacionGeneralReporte::where('id_planta', $idPlanta)->get();
 
             // Obtención de informaicón
             $reporteVolumetrico = [
@@ -45,8 +45,6 @@ class GenReporteVolumetricoController extends Controller
                     ],
                     "MarcaComercial" => "Gas Butano Zacatecas S.A de C.V",
                     "TANQUE" => [],
-                    "DUCTO" => [],
-                    "POZO" => [],
                     "DISPENSARIO" => []
                 ],
                 "BitacoraMensual" => [

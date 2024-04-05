@@ -26,6 +26,7 @@ class RegistroLlenadoAlmacenController extends Controller
     public function store(Request $request)
     {
         try {
+            $data['id_planta'] = $request['id_planta'];
             $data["nombre_contenedor"] = $request["nombre_contenedor"];
             $data["cantidad_inical"] = $request["cantidad_inical"];
             $data["cantidad_final"] = $request["cantidad_final"];

@@ -55,6 +55,7 @@ class ReporteVolumetricoController extends Controller
     public function update(Request $request, ReporteVolumetrico $reporteVolumetrico)
     {
         try {
+            $data['id_planta'] = $request['id_planta'];
             $data['reporte'] = $request['reporte'];
 
             ReporteVolumetrico::find($id)->update($data);

@@ -129,6 +129,6 @@ Route::middleware('auth:sanctum')->group( function () {
 
     
     Route::controller(GenReporteVolumetricoController::class)->group(function() {
-        Route::get('/v1/generar-reporte', 'generarReporte');
+        Route::get('/v1/generar-reporte/{idPlanta}', 'generarReporte');
     });
 });

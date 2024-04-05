@@ -57,6 +57,7 @@ class PipaController extends Controller
     public function update(Request $request, Pipa $pipa)
     {
         try {
+            $data['id_planta'] = $request['id_planta'];
             $data["responsable_pipa"] = $request["responsable_pipa"];
             $data["capacidad_pipa"] = $request["capacidad_pipa"];
             $data["clave_pipa"] = $request["clave_pipa"];
