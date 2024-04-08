@@ -16,7 +16,7 @@ class InformacionGeneralReporte extends Model
         'rfc_contribuyente',
         'rfc_representante_legal',
         'rfc_proveedor',
-        'ref_proveedores',
+        'rfc_proveedores',
         'tipo_caracter',
         'modalidad_permiso',
         'numero_permiso',

@@ -10,14 +10,19 @@ class GenReporteVolumetricoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function generarReporte($idPlanta)
+    public function generarReporte($idPlanta, $monthAndYear)
     {
-        date_default_timezone_set('America/Mexico_City');
-
         // Obtención de las reglas del SAT
+        date_default_timezone_set('America/Mexico_City');
         $json_reglas_sat = file_get_contents(public_path('docs\Mensual.schema.json'));
-
         $reglas = json_decode($json_reglas_sat, true);
+
+        // Obtención del parametro hora y fecha
+        $parts = explode('-', $monthAndYear);
+        $year = $parts[0];
+        $month = $parts[1];
+
+        
 
         
         try {
@@ -44,8 +49,7 @@ class GenReporteVolumetricoController extends Controller
                         "ComposDeButanoEnGasLP" => 40.00
                     ],
                     "MarcaComercial" => "Gas Butano Zacatecas S.A de C.V",
-                    "TANQUE" => [],
-                    "DISPENSARIO" => []
+                    "TANQUE" => []
                 ],
                 "BitacoraMensual" => [
                     "NumeroRegistro" => 1,

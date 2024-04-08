@@ -13,8 +13,21 @@ class Pipa extends Model
 
     protected $fillable = [
         'id_planta',
-        "responsable_pipa",
-        "capacidad_pipa",
-        "clave_pipa"
+        'clave_pipa',
+        'localizacion_descripcion_pipa',
+        'vigencia_calibracion_tanque',
+        'responsable_pipa',
+        'capacidad_pipa',
+        'capacidad_operativa',
+        'capacidad_util',
+        'capacidad_fondaje',
+        'volumen_minimo_operacion',
+        'estado_tanque',
     ];
+
+    // Define la relación con el modelo RegistroEntradasSalidasPipa
+    public function registrosEntradasSalidasPipa()
+    {
+        return $this->hasMany(RegistroEntradasSalidasPipa::class, 'id_pipa', 'id');
+    }
 }

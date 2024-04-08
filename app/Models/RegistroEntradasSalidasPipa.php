@@ -13,9 +13,16 @@ class RegistroEntradasSalidasPipa extends Model
 
     protected $fillable = [
         'id_planta',
+        'id_pipa',
         "inventario_inical",
         "compra",
         "venta",
         "inventario_final"
     ];
+
+    // Define la relación con el modelo Pipa
+    public function pipa()
+    {
+        return $this->belongsTo(Pipa::class, 'id_pipa', 'id');
+    }
 }

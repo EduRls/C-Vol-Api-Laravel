@@ -11,21 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pipa', function (Blueprint $table) {
+        Schema::create('almacen', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('id_planta')->unsigned();
-            $table->string('clave_pipa')->nullable(false);
-            $table->string('localizacion_descripcion_pipa')->nullable(false);
+            $table->string('clave_almacen')->nullable(false);
+            $table->string('localizacion_descripcion_almacen')->nullable(false);
             $table->string('vigencia_calibracion_tanque')->nullable(false);
-            $table->string('responsable_pipa')->nullable(false);
-            $table->integer('capacidad_pipa')->nullable(false);
+            $table->integer('capacidad_almacen')->nullable(false);
             $table->integer('capacidad_operativa')->nullable(false);
             $table->integer('capacidad_util')->nullable(false);
             $table->integer('capacidad_fondaje')->nullable(false);
             $table->integer('volumen_minimo_operacion')->nullable(false);
             $table->string('estado_tanque')->nullable(false);
-            $table->timestamps();
             $table->softDeletes(); 
+            $table->timestamps();
+
             $table->foreign('id_planta')->references('id')->on('planta_gas')->onDelete('no action');
         });
     }
@@ -35,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pipa');
+        Schema::dropIfExists('almacen');
     }
 };

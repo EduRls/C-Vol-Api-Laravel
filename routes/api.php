@@ -14,6 +14,7 @@ use App\Http\Controllers\InformacionGeneralReporteController;
 use App\Http\Controllers\GenReporteVolumetricoController;
 use App\Http\Controllers\RolesUsuariosController;
 use App\Http\Controllers\PlantaGasController;
+use App\Http\Controllers\AlmacenController;
 
 /*
 |--------------------------------------------------------------------------
@@ -75,11 +76,11 @@ Route::middleware('auth:sanctum')->group( function () {
 
     //Registro llenado del almacen
     Route::controller(RegistroLlenadoAlmacenController::class)->group(function(){
-        Route::get('/v1/almacen/registro/{idPlanta}', 'index');
-        Route::get('/v1/almacen/registro/{id}', 'show');
-        Route::post('/v1/almacen/registro', 'store');
-        Route::post('/v1/almacen/registro/{id}', 'update');
-        Route::delete('/v1/almacen/registro/{id}', 'destroy'); 
+        Route::get('/v1/almacen-registro/{idPlanta}', 'index');
+        Route::get('/v1/almacen-registro/{id}', 'show');
+        Route::post('/v1/almacen-registro', 'store');
+        Route::post('/v1/almacen-registro/{id}', 'update');
+        Route::delete('/v1/almacen-registro/{id}', 'destroy'); 
     });
 
     //Registro para el reporte volumetrico
@@ -127,8 +128,16 @@ Route::middleware('auth:sanctum')->group( function () {
         Route::delete('/v1/reporteVolumetrico/informacion-general/{id}', 'destroy');
     });
 
+    Route::controller(AlmacenController::class)->group(function() {
+        Route::get('/v1/almacen/{idPlanta}', 'index');
+        Route::get('/v1/almacen/{id}', 'show');
+        Route::post('/v1/almacen', 'store');
+        Route::post('/v1/almacen/{id}', 'update');
+        Route::delete('/v1/almacen/{id}', 'destroy');
+    });
+
     
     Route::controller(GenReporteVolumetricoController::class)->group(function() {
-        Route::get('/v1/generar-reporte/{idPlanta}', 'generarReporte');
+        Route::get('/v1/generar-reporte/{idPlanta}/{monthAndYear}', 'generarReporte');
     });
 });

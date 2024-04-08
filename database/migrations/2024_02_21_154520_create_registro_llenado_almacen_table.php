@@ -14,13 +14,14 @@ return new class extends Migration
         Schema::create('registro_llenado_almacen', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('id_planta')->unsigned();
-            $table->string('nombre_contenedor', 100)->nullable(false);
+            $table->bigInteger('id_almacen')->unsigned();
             $table->string('cantidad_inical', 45)->nullable(false);
             $table->string('cantidad_final', 45)->nullable(false);
             $table->datetime('fecha_llenado')->nullable(false);
             $table->timestamps();
             $table->softDeletes();  
             $table->foreign('id_planta')->references('id')->on('planta_gas')->onDelete('no action');
+            $table->foreign('id_almacen')->references('id')->on('almacen')->onDelete('no action');
         });
     }
 

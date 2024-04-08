@@ -13,7 +13,7 @@ class RegistroEntradasSalidasPipaController extends Controller
     public function index($idPlanta)
     {
         try {
-            $data = RegistroEntradasSalidasPipa::where('id_planta', $idPlanta)->get();
+            $data = RegistroEntradasSalidasPipa::with('pipa')->where('id_planta', $idPlanta)->get();
             return response()->json($data, 200);
         } catch (\Throwable $th) {
             return response()->json([ 'error' => $th->getMessage() ], 500);
@@ -27,6 +27,7 @@ class RegistroEntradasSalidasPipaController extends Controller
     {
         try {
             $data['id_planta'] = $request['id_planta'];
+            $data['id_pipa'] = $request['id_pipa'];
             $data["inventario_inical"] = $request["inventario_inical"];
             $data["compra"] = $request["compra"];
             $data["venta"] = $request["venta"];
@@ -60,6 +61,7 @@ class RegistroEntradasSalidasPipaController extends Controller
     {
         try {
             $data['id_planta'] = $request['id_planta'];
+            $data['id_pipa'] = $request['id_pipa'];
             $data["inventario_inical"] = $request["inventario_inical"];
             $data["compra"] = $request["compra"];
             $data["venta"] = $request["venta"];
