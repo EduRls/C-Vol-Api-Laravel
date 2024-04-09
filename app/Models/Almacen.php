@@ -23,4 +23,9 @@ class Almacen extends Model
         'volumen_minimo_operacion',
         'estado_tanque'
     ];
+
+    public function registrosEntradasSalidasAlmacen()
+    {
+        return $this->hasMany(RegistroLlenadoAlmacen::class, 'id_almacen', 'id');
+    }
 }

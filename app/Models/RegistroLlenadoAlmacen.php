@@ -13,9 +13,15 @@ class RegistroLlenadoAlmacen extends Model
 
     protected $fillable = [
         'id_planta',
-        "nombre_contenedor",
+        "id_almacen",
         "cantidad_inical",
         "cantidad_final",
         "fecha_llenado"
     ];
+
+    // Define la relación con el modelo Pipa
+    public function almacen()
+    {
+        return $this->belongsTo(Almacen::class, 'id_almacen', 'id');
+    }
 }
