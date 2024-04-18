@@ -15,4 +15,9 @@ class PlantaGas extends Model
         'id_planta',
         "nombre_planta"
     ];
+
+    public function usuarios()
+    {
+        return $this->hasMany(User::class, 'id_planta');
+    }
 }

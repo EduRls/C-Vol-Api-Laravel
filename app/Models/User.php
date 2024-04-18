@@ -44,4 +44,14 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function planta()
+    {
+        return $this->belongsTo(PlantaGas::class, 'id_planta');
+    }
+
+    public function rol()
+    {
+        return $this->belongsTo(RolesUsuarios::class, 'id_rol_usuario');
+    }
 }

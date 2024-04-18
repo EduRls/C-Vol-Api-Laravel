@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\InformacionGeneralReporte;
+use App\Models\RegistroEntradasSalidasPipa;
+use App\Models\Pipa;
 
 use PhpCfdi\SatWsDescargaMasiva\RequestBuilder\FielRequestBuilder\Fiel;
 use PhpCfdi\SatWsDescargaMasiva\RequestBuilder\FielRequestBuilder\FielRequestBuilder;
@@ -58,7 +60,7 @@ class GenReporteVolumetricoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function generarReporte($idPlanta, $monthAndYear)
+    public function generarReporte($idPlanta, $yearAndMonth)
     {
         // Obtención de las reglas del SAT
         date_default_timezone_set('America/Mexico_City');
@@ -66,49 +68,222 @@ class GenReporteVolumetricoController extends Controller
         $reglas = json_decode($json_reglas_sat, true);
 
         // Obtención del parametro hora y fecha
-        $parts = explode('-', $monthAndYear);
+        $parts = explode('-', $yearAndMonth);
         $year = $parts[0];
         $month = $parts[1];
-
         
-
         
         try {
+            // INFORMAICÓN GENERAL PARA EL REPORTE VOLUMÉTRICO
             $dataReporteGeneral = InformacionGeneralReporte::where('id_planta', $idPlanta)->get();
 
-            // Obtención de informaicón
-            $reporteVolumetrico = [
-                "Version" => 1.0,
-                "RfcContribuyente" => $dataReporteGeneral[0]['rfc_contribuyente'],
-                "RfcProveedor" => $dataReporteGeneral[0]['rfc_representante_legal'],
-                "Caracter" => $dataReporteGeneral[0]['tipo_caracter'],
-                "ClaveInstalacion" => $dataReporteGeneral[0]['clave_instalacion'],
-                "DescripcionInstalacion" => $dataReporteGeneral[0]['descripcion_instalacion'],
-                "NumeroPozos" => $dataReporteGeneral[0]['numero_pozos'],
-                "NumeroTanques" => $dataReporteGeneral[0]['numero_tanques'],
-                "NumeroDuctosEntradaSalida" => $dataReporteGeneral[0]['numero_ductos_entrada_salida'],
-                "NumeroDuctosTransporteDistribucion" => $dataReporteGeneral[0]['numero_ductos_transporte'],
-                "NumeroDispensarios" => $dataReporteGeneral[0]['numero_dispensarios'],
-                "FechaYHoraReporteMes" => date("Y-m-d H:i:s"),
-                "Producto" => [
-                    "ClaveProducto" => "PR12",
-                    "GasLP" => [
-                        "ComposDePropanoEnGasLP" => 60.00,
-                        "ComposDeButanoEnGasLP" => 40.00
-                    ],
-                    "MarcaComercial" => "Gas Butano Zacatecas S.A de C.V",
-                    "TANQUE" => []
-                ],
-                "BitacoraMensual" => [
-                    "NumeroRegistro" => 1,
-                    "FechaYHoraEvento" => date("Y-m-d H:i:s"),
-                    "UsuarioResponsable" => "Juan Manual Zepeda Martinez",
-                    "TipoEvento" => 1,
-                    "DescripcionEvento" => "Declaración mensual de control volumétrico"
-                ]
-            ];
+            // INFORMACIÓN GENERAL DE LAS PIPAS
+            $dataPipasGeneral = Pipa::where('id_planta', $idPlanta)->get();
 
-            return response()->json($reporteVolumetrico);
+            $dataEntradasYSalidasPipas = RegistroEntradasSalidasPipa::with('pipa')
+                ->selectRaw('id_pipa, SUM(inventario_inical) as inventario_inicial, SUM(compra) as total_compra, SUM(venta) as total_venta, SUM(inventario_final) as inventario_final, COUNT(*) as cantidad_registros')
+                ->where('id_planta', $idPlanta)
+                ->whereYear('created_at', '=', $year)
+                ->whereMonth('created_at', '=', $month)
+                ->groupBy('id_pipa')
+                ->get();
+
+
+            if(count($dataReporteGeneral) != 0){
+
+                $reporteVolumetrico = [
+                    "Version" => 1.0,
+                    "RfcContribuyente" => $dataReporteGeneral[0]['rfc_contribuyente'],
+                    "RfcProveedor" => $dataReporteGeneral[0]['rfc_representante_legal'],
+                    "Caracter" => [],
+                    "ClaveInstalacion" => $dataReporteGeneral[0]['clave_instalacion'],
+                    "DescripcionInstalacion" => $dataReporteGeneral[0]['descripcion_instalacion'],
+                    "NumeroPozos" => $dataReporteGeneral[0]['numero_pozos'],
+                    "NumeroTanques" => $dataReporteGeneral[0]['numero_tanques'],
+                    "NumeroDuctosEntradaSalida" => $dataReporteGeneral[0]['numero_ductos_entrada_salida'],
+                    "NumeroDuctosTransporteDistribucion" => $dataReporteGeneral[0]['numero_ductos_transporte'],
+                    "NumeroDispensarios" => $dataReporteGeneral[0]['numero_dispensarios'],
+                    "FechaYHoraReporteMes" => date("Y-m-d H:i:s"),
+                    "PRODUCTO" => [
+                        "ClaveProducto" => "PR12",
+                        "GasLP" => [
+                            "ComposDePropanoEnGasLP" => 60.00,
+                            "ComposDeButanoEnGasLP" => 40.00
+                        ],
+                        "MarcaComercial" => "Gas Butano Zacatecas S.A de C.V",
+                        "TANQUE" => []
+                    ],
+                    "BitacoraMensual" => [
+                        "NumeroRegistro" => null,
+                        "FechaYHoraEvento" => null,
+                        "UsuarioResponsable" => null,
+                        "TipoEvento" => null,
+                        "DescripcionEvento" => null
+                    ]
+                ];
+
+                $caracter = [];
+
+                switch ($dataReporteGeneral[0]['tipo_caracter']) {
+                    case 'permisionario':
+                        $caracter = [
+                            'TipoCaracter' => $dataReporteGeneral[0]['tipo_caracter'],
+                            'ModalidadPermiso' => $dataReporteGeneral[0]['modalidad_permiso'],
+                            'NumPermiso' => $dataReporteGeneral[0]['numero_permiso']
+                        ];
+                        break;
+                    case 'asignatario':
+                    case 'contratista':
+                        $caracter = [
+                            'TipoCaracter' => $dataReporteGeneral[0]['tipo_caracter'],
+                            'NumContratoOAsignacion' => $dataReporteGeneral[0]['numero_contrato_asignacion']
+                        ];
+                        break;
+                    case 'usuario':
+                        $caracter = [
+                            'TipoCaracter' => $dataReporteGeneral[0]['tipo_caracter'],
+                            'InstalacionAlmacenGasNatural' => $dataReporteGeneral[0]['instalacion_almacen_gas']
+                        ];
+                        break;
+                    default:
+                        $caracter = [
+                            'TipoCaracter' => $dataReporteGeneral[0]['tipo_caracter'],
+                            'Mensaje' => 'Tipo de caracter no reconocido'
+                        ];
+                        break;
+                }
+
+                $reporteVolumetrico["Caracter"] = $caracter;
+
+
+                $tanques = [];
+
+                foreach($dataPipasGeneral as $pipaObject){
+
+                    $taqnuesTemporales = [];
+
+                    $taqnuesTemporales['ClaveIdentificacionTanque'] = $pipaObject['clave_pipa'];
+                    $taqnuesTemporales['LocalizacionY/ODescripcionTanque'] = $pipaObject['localizacion_descripcion_pipa'];
+                    $taqnuesTemporales['VigenciaCalibracionTanque'] = $pipaObject['vigencia_calibracion_tanque'];
+                    $taqnuesTemporales['CapacidadTotalTanque'] = [
+                        'ValorNumerico' => $pipaObject['capacidad_pipa'],
+                        'UM' => 'UM03'
+                    ];
+                    $taqnuesTemporales['CapacidadOperativaTanque'] = [
+                        'ValorNumerico' => $pipaObject['capacidad_operativa'],
+                        'UM' => 'UM03'
+                    ];
+                    $taqnuesTemporales['CapacidadUtilTanque'] = [
+                        'ValorNumerico' => $pipaObject['capacidad_util'],
+                        'UM' => 'UM03'
+                    ];
+                    $taqnuesTemporales['CapacidadFondajeTanque'] = [
+                        'ValorNumerico' => $pipaObject['capacidad_fondaje'],
+                        'UM' => 'UM03'
+                    ];
+                    $taqnuesTemporales['VolumenMinimoOperacion'] = [
+                        'ValorNumerico' =>  $pipaObject['volumen_minimo_operacion'],
+                        'UM' => 'UM03'
+                    ];
+                    $taqnuesTemporales['EstadoTanque'] = $pipaObject['estado_tanque'];
+
+                    foreach($dataEntradasYSalidasPipas as $objeto) {
+                        $pipa = $objeto['pipa'];
+    
+                        if($pipa['id'] == $pipaObject['id']){
+                            $taqnuesTemporales['EXISTENCIAS'] = [
+                                'VolumenExistenciasAnterior' => intval($objeto['inventario_inicial']),
+                                'VolumenAcumOpsRecepcion' => [
+                                    'ValorNumerico' =>  NULL,
+                                    'UM' => 'UM03'
+                                ],
+                                'HoraRecepcionAcumulado' => NULL,
+                                'VolumenAcumOpsEntrega' => [
+                                    'ValorNumerico' =>  NULL,
+                                    'UM' => 'UM03'
+                                ],
+                                'HoraEntregaAcumulado' => NULL,
+                                'VolumenExistencias' => [
+                                    'ValorNumerico' =>  NULL,
+                                    'UM' => 'UM03'
+                                ],
+                                'FechaYHoraEstaMedicion' => NULL
+                            ];
+                            $taqnuesTemporales['RECEPCIONES'] = [
+                                'TotalRecepciones' => NULL,
+                                'SumaVolumenRecepcion' => [
+                                    'ValorNumerico' =>  NULL,
+                                    'UM' => 'UM03'
+                                ],
+                                'TotalDocumentos' => intval($objeto['cantidad_registros']),
+                                'SumaCompras' => NULL,
+                                'RECEPCION' => [
+                                    'NumeroDeRegistro' => NULL,
+                                    'TipoDeRegistro' => NULL,
+                                    'VolumenInicialTanque' => [
+                                        'ValorNumerico' =>  NULL,
+                                        'UM' => 'UM03'
+                                    ],
+                                    'VolumenFinalTanque' => [
+                                        'ValorNumerico' =>  NULL,
+                                        'UM' => 'UM03'
+                                    ],
+                                    'VolumenRecepcion' => [
+                                        'ValorNumerico' =>  NULL,
+                                        'UM' => 'UM03'
+                                    ],
+                                    'Temperatura' => NULL,
+                                    'PresionAbsoluta' => NULL,
+                                    'FechaYHoraInicioRecepcion' => NULL,
+                                    'FechaYHoraFinalRecepcion' => NULL
+                                ]
+                            ];
+                            $taqnuesTemporales['ENTREGAS'] = [
+                                'TotalEntregas' => NULL,
+                                'SumaVolumenEntregado' => [
+                                    'ValorNumerico' =>  NULL,
+                                    'UM' => 'UM03'
+                                ],
+                                'TotalDocumentos' => NULL,
+                                'SumaVentas' => NULL,
+                                'ENTREGA' => [
+                                    'NumeroDeRegistro' => NULL,
+                                    'TipoDeRegistro' => NULL,
+                                    'VolumenInicialTanque' => [
+                                        'ValorNumerico' =>  NULL,
+                                        'UM' => 'UM03'
+                                    ],
+                                    'VolumenFinalTanque' => [
+                                        'ValorNumerico' =>  NULL,
+                                        'UM' => 'UM03'
+                                    ],
+                                    'VolumenEntregado' => [
+                                        'ValorNumerico' =>  NULL,
+                                        'UM' => 'UM03'
+                                    ],
+                                    'Temperatura' => NULL,
+                                    'PresionAbsoluta' => NULL,
+                                    'FechaYHoraInicioEntrega' => NULL,
+                                    'FechaYHoraFinalEntrega' => NULL
+                                ]
+                            ];
+                        }
+                    }
+
+                    $tanques[] = $taqnuesTemporales;
+
+                }
+
+                
+                $reporteVolumetrico['Producto']['TANQUE'] = $tanques;
+
+                return response()->json($reporteVolumetrico);
+            }else{
+                $respuesta = [
+                    'error' => 'No se encontró registro, favor de llenar la infromaicón general'
+                ];
+                return response()->json($respuesta);
+            }
         } catch (\Throwable $th) {
             return response()->json(['error' => $th->getMessage()], 500);
         }

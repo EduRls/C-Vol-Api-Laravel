@@ -25,12 +25,19 @@ class InformacionGeneralReporteController extends Controller
      */
     public function store(Request $request)
     {
+        $rfc_proveedores;
+
+        if($request['rfc_proveedores'] != null){
+            $rfc_proveedores = explode(',', $request['rfc_proveedores']);
+        }else{
+            $rfc_proveedores = null;
+        }
         try {
             $data['id_planta'] = $request['id_planta'];
             $data['rfc_contribuyente'] = $request['rfc_contribuyente'];
             $data['rfc_representante_legal'] = $request['rfc_representante_legal'];
             $data['rfc_proveedor'] = $request['rfc_proveedor'];
-            $data['rfc_proveedores'] = explode(',', $request['rfc_proveedores']);
+            $data['rfc_proveedores'] = $rfc_proveedores;
             $data['tipo_caracter'] = $request['tipo_caracter'];
             $data['modalidad_permiso'] = $request['modalidad_permiso'];
             $data['numero_permiso'] = $request['numero_permiso'];

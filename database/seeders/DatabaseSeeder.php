@@ -41,6 +41,8 @@ class DatabaseSeeder extends Seeder
 
          \App\Models\User::factory()->create([
             'name' => 'Tarjetita ESP8266',
+            'id_planta' => 1,
+            'id_rol_usuario' => 2,
             'email' => 'esp8266@gasbutano.com',
             'password' => 'esp8266butano'
         ]);

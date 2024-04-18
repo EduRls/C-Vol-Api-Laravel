@@ -72,7 +72,7 @@ class LoginRegisterController extends Controller
         }
 
         // Check email exist
-        $user = User::where('email', $request->email)->first();
+        $user = User::with('planta')->with('rol')->where('email', $request->email)->first();
 
         // Check password
         if(!$user || !Hash::check($request->password, $user->password)) {

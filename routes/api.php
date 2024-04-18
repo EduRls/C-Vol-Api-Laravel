@@ -15,17 +15,7 @@ use App\Http\Controllers\GenReporteVolumetricoController;
 use App\Http\Controllers\RolesUsuariosController;
 use App\Http\Controllers\PlantaGasController;
 use App\Http\Controllers\AlmacenController;
-
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
+use App\Http\Controllers\UserController;
 
 // Rutas publicas para acceder o registrar una cuenta
 Route::controller(LoginRegisterController::class)->group(function() {
@@ -123,7 +113,7 @@ Route::middleware('auth:sanctum')->group( function () {
     Route::controller(InformacionGeneralReporteController::class)->group(function() {
         Route::get('/v1/reporteVolumetrico/informacion-general/{idPlanta}', 'index');
         Route::get('/v1/reporteVolumetrico/informacion-general/{id}', 'show');
-        Route::post('/v1/reporteVolumetrico/informacion-generala', 'store');
+        Route::post('/v1/reporteVolumetrico/informacion-general', 'store');
         Route::post('/v1/reporteVolumetrico/informacion-general/{id}', 'update');
         Route::delete('/v1/reporteVolumetrico/informacion-general/{id}', 'destroy');
     });
@@ -136,9 +126,16 @@ Route::middleware('auth:sanctum')->group( function () {
         Route::delete('/v1/almacen/{id}', 'destroy');
     });
 
-    
     Route::controller(GenReporteVolumetricoController::class)->group(function() {
-        Route::get('/v1/generar-reporte/{idPlanta}/{monthAndYear}', 'generarReporte');
+        Route::get('/v1/generar-reporte/{idPlanta}/{yearAndMonth}', 'generarReporte');
         Route::get('/v1/ConsultCDFI', 'consultarCFDI');
+    });
+
+    Route::controller(UserController::class)->group(function() {
+        Route::get('/v1/usuario/{idPlanta}', 'index');
+        Route::get('/v1/usuario/{idPlanta}/{idUsuario}', 'show');
+        Route::post('/v1/usuario', 'store');
+        Route::post('/v1/usuario/{id}', 'update');
+        Route::delete('/v1/usuario/{id}', 'destroy');
     });
 });
