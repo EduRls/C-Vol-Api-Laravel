@@ -201,12 +201,13 @@ class GenReporteVolumetricoController extends Controller
             $dataPipasGeneral = Pipa::where('id_planta', $idPlanta)->get();
 
             $dataEntradasYSalidasPipas = RegistroEntradasSalidasPipa::with('pipa')
-                ->selectRaw('id_pipa, SUM(inventario_inical) as inventario_inicial, SUM(compra) as total_compra, SUM(venta) as total_venta, SUM(inventario_final) as inventario_final, COUNT(*) as cantidad_registros')
+                ->selectRaw('id_pipa, SUM(inventario_inical) as inventario_inicial, SUM(compra) as total_compra, SUM(venta) as total_venta, SUM(inventario_final) as inventario_final, COUNT(*) as cantidad_registros, DATE_FORMAT(CONVERT_TZ(created_at, "+00:00", "-01:00"), "%H:%i:%s") AS HoraRecepcionAcumulado')
                 ->where('id_planta', $idPlanta)
                 ->whereYear('created_at', '=', $year)
                 ->whereMonth('created_at', '=', $month)
-                ->groupBy('id_pipa')
+                ->groupBy('id_pipa', 'created_at')
                 ->get();
+
             $dataAlmacenimiento;
 
 
@@ -309,20 +310,17 @@ class GenReporteVolumetricoController extends Controller
                             $taqnuesTemporales['EXISTENCIAS'] = [
                                 'VolumenExistenciasAnterior' => intval($objeto['inventario_inicial']),
                                 'VolumenAcumOpsRecepcion' => [
-                                    'ValorNumerico' =>  NULL,
+                                    'ValorNumerico' =>  intval($objeto['total_compra']),
                                     'UM' => 'UM03'
                                 ],
-                                'HoraRecepcionAcumulado' => NULL,
+                                'HoraRecepcionAcumulado' => $objeto['HoraRecepcionAcumulado'] . '-01:00',
                                 'VolumenAcumOpsEntrega' => [
-                                    'ValorNumerico' =>  NULL,
+                                    'ValorNumerico' =>  intval($objeto['total_venta']),
                                     'UM' => 'UM03'
                                 ],
-                                'HoraEntregaAcumulado' => NULL,
-                                'VolumenExistencias' => [
-                                    'ValorNumerico' =>  NULL,
-                                    'UM' => 'UM03'
-                                ],
-                                'FechaYHoraEstaMedicion' => NULL
+                                'HoraEntregaAcumulado' => $objeto['HoraRecepcionAcumulado'] . '-01:00',
+                                'VolumenExistencias' => intval($objeto['inventario_inicial']) + intval($objeto['total_compra']) - intval($objeto['total_venta']),
+                                'FechaYHoraEstaMedicion' => $objeto['HoraRecepcionAcumulado'] . '-01:00'
                             ];
                             $taqnuesTemporales['RECEPCIONES'] = [
                                 'TotalRecepciones' => NULL,
