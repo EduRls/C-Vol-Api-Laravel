@@ -12,6 +12,7 @@ class BitacoraEventos extends Model
     protected $table = 'bitacora_eventos';
 
     protected $fillable = [
+        'id_planta',
         'NumeroRegistro',
         'FechaYHoraEvento',
         'UsuarioResponsable',

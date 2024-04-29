@@ -6,10 +6,12 @@ use Illuminate\Http\Request;
 use App\Models\InformacionGeneralReporte;
 use App\Models\RegistroEntradasSalidasPipa;
 use App\Models\Pipa;
+use App\Models\BitacoraEventos;
 
 use PhpCfdi\SatWsDescargaMasiva\RequestBuilder\FielRequestBuilder\Fiel;
 use PhpCfdi\SatWsDescargaMasiva\RequestBuilder\FielRequestBuilder\FielRequestBuilder;
 use PhpCfdi\SatWsDescargaMasiva\Service;
+use PhpCfdi\SatWsDescargaMasiva\Shared\ServiceEndpoints;
 use PhpCfdi\SatWsDescargaMasiva\WebClient\GuzzleWebClient;
 use PhpCfdi\SatWsDescargaMasiva\Services\Query\QueryParameters;
 use PhpCfdi\SatWsDescargaMasiva\Shared\DateTimePeriod;
@@ -25,54 +27,23 @@ class GenReporteVolumetricoController extends Controller
             '12345678a'
         );
 
-        // verificar que la FIEL sea válida (no sea CSD y sea vigente acorde a la fecha del sistema)
         if (! $fiel->isValid()) {
             return;
         }
 
-        // creación del web client basado en Guzzle que implementa WebClientInterface
-        // para usarlo necesitas instalar guzzlehttp/guzzle, pues no es una dependencia directa
         $webClient = new GuzzleWebClient();
 
-        // creación del objeto encargado de crear las solicitudes firmadas usando una FIEL
         $requestBuilder = new FielRequestBuilder($fiel);
 
         // Creación del servicio
         $service = new Service($requestBuilder, $webClient);
 
-        // Crear la consulta
-        $request = QueryParameters::create(
-            DateTimePeriod::createFromValues('2019-01-13 00:00:00', '2019-01-13 23:59:59'),
-        );
+        $service = new Service($requestBuilder, $webClient, null, ServiceEndpoints::cfdi());
 
-        // presentar la consulta
-        $query = $service->query($request);
-
-        // verificar que el proceso de consulta fue correcto
-        if (! $query->getStatus()->isAccepted()) {
-            echo "Fallo al presentar la consulta: {$query->getStatus()->getMessage()}";
-            return;
-        }
-
-        // el identificador de la consulta está en $query->getRequestId()
-        echo "Se generó la solicitud {$query->getRequestId()}", PHP_EOL;
+        return $service;
     }
-    /**
-     * Display a listing of the resource.
-     */
-    public function generarReporte($idPlanta, $yearAndMonth)
-    {
-        // Obtención de las reglas del SAT
-        date_default_timezone_set('America/Mexico_City');
-        $json_reglas_sat = file_get_contents(public_path('docs\Mensual.schema.json'));
-        $reglas = json_decode($json_reglas_sat, true);
-
-        // Obtención del parametro hora y fecha
-        $parts = explode('-', $yearAndMonth);
-        $year = $parts[0];
-        $month = $parts[1];
-        
-        
+    
+    public function generarReporteMensual($idPlanta, $year, $month){
         try {
             // INFORMAICÓN GENERAL PARA EL REPORTE VOLUMÉTRICO
             $dataReporteGeneral = InformacionGeneralReporte::where('id_planta', $idPlanta)->get();
@@ -87,6 +58,13 @@ class GenReporteVolumetricoController extends Controller
                 ->whereMonth('created_at', '=', $month)
                 ->groupBy('id_pipa')
                 ->get();
+
+            $dataBitacoraEventos = BitacoraEventos::where('id_planta', $idPlanta)
+            ->whereYear('created_at', '=', $year)
+            ->whereMonth('created_at', '=', $month)
+            ->get();
+
+            $dataAlmacenimiento;
 
 
             if(count($dataReporteGeneral) != 0){
@@ -111,9 +89,42 @@ class GenReporteVolumetricoController extends Controller
                             "ComposDeButanoEnGasLP" => 40.00
                         ],
                         "MarcaComercial" => "Gas Butano Zacatecas S.A de C.V",
-                        "TANQUE" => []
+                        "REPORTEDEVOLUMENMENSUAL" => [
+                            "CONTROLDEEXISTENCIAS" => [
+                                "VolumenExistenciasMes" => NULL,
+                                "FechaYHoraEstaMedicionMes" => NULL
+                            ],
+                            "RECEPCIONES" => [
+                                "TotalRecepcionesMes" => NULL,
+                                "SumaVolumenRecepcionMes" => [
+                                    "ValorNumerico" => NULL,
+                                    "UM" => NULL
+                                ],
+                                "PoderCalorifico" => [
+                                    "ValorNumerico" => NULL,
+                                    "UM" => NULL
+                                ],
+                                "TotalDocumentosMes" => NULL,
+                                "ImporteTotalRecepcionesMensual" => NULL, 
+                                "Complemento" => []
+                            ],
+                            "ENTREGAS" => [
+                                "TotalEntregasMes" => NULL,
+                                "SumaVolumenEntregadoMes" => [
+                                    "ValorNumerico" => NULL,
+                                    "UM" => NULL
+                                ],
+                                "PoderCalorifico" => [
+                                    "ValorNumerico" => NULL,
+                                    "UM" => NULL
+                                ],
+                                "TotalDocumentosMes" => NULL,
+                                "ImporteTotalEntregasMes" => NULL,
+                                "Complemento" => []
+                            ]
+                        ]
                     ],
-                    "BitacoraMensual" => [
+                    "BITACORAMENSUAL" => [
                         "NumeroRegistro" => null,
                         "FechaYHoraEvento" => null,
                         "UsuarioResponsable" => null,
@@ -122,8 +133,8 @@ class GenReporteVolumetricoController extends Controller
                     ]
                 ];
 
+                // CARACTERA
                 $caracter = [];
-
                 switch ($dataReporteGeneral[0]['tipo_caracter']) {
                     case 'permisionario':
                         $caracter = [
@@ -152,12 +163,116 @@ class GenReporteVolumetricoController extends Controller
                         ];
                         break;
                 }
-
                 $reporteVolumetrico["Caracter"] = $caracter;
 
+                // INFORMACIÓN GENERAL BITACORA
 
+                $bitacora = [];
+                foreach ($dataBitacoraEventos as $bitacoraEvento) {
+                    $bitacora[] = [
+                        "NumeroRegistro" => $bitacoraEvento->NumeroRegistro,
+                        "FechaYHoraEvento" => $bitacoraEvento->FechaYHoraEvento,
+                        "UsuarioResponsable" => $bitacoraEvento->UsuarioResponsable,
+                        "TipoEvento" => $bitacoraEvento->TipoEvento,
+                        "DescripcionEvento" => $bitacoraEvento->DescripcionEvento
+                    ];
+                }
+                $reporteVolumetrico["BITACORAMENSUAL"] = $bitacora;
+
+
+                return response()->json($reporteVolumetrico);
+            }else{
+                $respuesta = [
+                    'error' => 'No se encontró registro, favor de llenar la infromaicón general'
+                ];
+                return response()->json($respuesta);
+            }
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $th->getMessage()], 500);
+        }
+    }
+
+    public function generarReportesDiarios($idPlanta, $year, $month){
+        try {
+            // INFORMAICÓN GENERAL PARA EL REPORTE VOLUMÉTRICO
+            $dataReporteGeneral = InformacionGeneralReporte::where('id_planta', $idPlanta)->get();
+
+            // INFORMACIÓN GENERAL DE LAS PIPAS
+            $dataPipasGeneral = Pipa::where('id_planta', $idPlanta)->get();
+
+            $dataEntradasYSalidasPipas = RegistroEntradasSalidasPipa::with('pipa')
+                ->selectRaw('id_pipa, SUM(inventario_inical) as inventario_inicial, SUM(compra) as total_compra, SUM(venta) as total_venta, SUM(inventario_final) as inventario_final, COUNT(*) as cantidad_registros')
+                ->where('id_planta', $idPlanta)
+                ->whereYear('created_at', '=', $year)
+                ->whereMonth('created_at', '=', $month)
+                ->groupBy('id_pipa')
+                ->get();
+            $dataAlmacenimiento;
+
+
+            if(count($dataReporteGeneral) != 0){
+
+                $reporteVolumetrico = [
+                    "Version" => 1.0,
+                    "RfcContribuyente" => $dataReporteGeneral[0]['rfc_contribuyente'],
+                    "RfcProveedor" => $dataReporteGeneral[0]['rfc_representante_legal'],
+                    "Caracter" => [],
+                    "ClaveInstalacion" => $dataReporteGeneral[0]['clave_instalacion'],
+                    "DescripcionInstalacion" => $dataReporteGeneral[0]['descripcion_instalacion'],
+                    "NumeroPozos" => $dataReporteGeneral[0]['numero_pozos'],
+                    "NumeroTanques" => $dataReporteGeneral[0]['numero_tanques'],
+                    "NumeroDuctosEntradaSalida" => $dataReporteGeneral[0]['numero_ductos_entrada_salida'],
+                    "NumeroDuctosTransporteDistribucion" => $dataReporteGeneral[0]['numero_ductos_transporte'],
+                    "NumeroDispensarios" => $dataReporteGeneral[0]['numero_dispensarios'],
+                    "FechaYHoraReporteMes" => date("Y-m-d H:i:s"),
+                    "PRODUCTO" => [
+                        "ClaveProducto" => "PR12",
+                        "GasLP" => [
+                            "ComposDePropanoEnGasLP" => 60.00,
+                            "ComposDeButanoEnGasLP" => 40.00
+                        ],
+                        "MarcaComercial" => "Gas Butano Zacatecas S.A de C.V",
+                        "TANQUE" => []
+                    ],
+                    "BITACORA" => [
+                        "NumeroRegistro" => null,
+                        "FechaYHoraEvento" => null,
+                        "UsuarioResponsable" => null,
+                        "TipoEvento" => null,
+                        "DescripcionEvento" => null
+                    ]
+                ];
+                $caracter = [];
+                switch ($dataReporteGeneral[0]['tipo_caracter']) {
+                    case 'permisionario':
+                        $caracter = [
+                            'TipoCaracter' => $dataReporteGeneral[0]['tipo_caracter'],
+                            'ModalidadPermiso' => $dataReporteGeneral[0]['modalidad_permiso'],
+                            'NumPermiso' => $dataReporteGeneral[0]['numero_permiso']
+                        ];
+                        break;
+                    case 'asignatario':
+                    case 'contratista':
+                        $caracter = [
+                            'TipoCaracter' => $dataReporteGeneral[0]['tipo_caracter'],
+                            'NumContratoOAsignacion' => $dataReporteGeneral[0]['numero_contrato_asignacion']
+                        ];
+                        break;
+                    case 'usuario':
+                        $caracter = [
+                            'TipoCaracter' => $dataReporteGeneral[0]['tipo_caracter'],
+                            'InstalacionAlmacenGasNatural' => $dataReporteGeneral[0]['instalacion_almacen_gas']
+                        ];
+                        break;
+                    default:
+                        $caracter = [
+                            'TipoCaracter' => $dataReporteGeneral[0]['tipo_caracter'],
+                            'Mensaje' => 'Tipo de caracter no reconocido'
+                        ];
+                        break;
+                }
+                $reporteVolumetrico["Caracter"] = $caracter;
                 $tanques = [];
-
                 foreach($dataPipasGeneral as $pipaObject){
 
                     $taqnuesTemporales = [];
@@ -273,9 +388,7 @@ class GenReporteVolumetricoController extends Controller
                     $tanques[] = $taqnuesTemporales;
 
                 }
-
-                
-                $reporteVolumetrico['Producto']['TANQUE'] = $tanques;
+                $reporteVolumetrico['PRODUCTO']['TANQUE'] = $tanques;
 
                 return response()->json($reporteVolumetrico);
             }else{
@@ -288,4 +401,34 @@ class GenReporteVolumetricoController extends Controller
             return response()->json(['error' => $th->getMessage()], 500);
         }
     }
+    /**
+     * Display a listing of the resource.
+     */
+    public function generarReporte($idPlanta, $yearAndMonth, $tipoDM)
+    {
+        // Obtención de las reglas del SAT
+        date_default_timezone_set('America/Mexico_City');
+        $json_reglas_sat = file_get_contents(public_path('docs\Mensual.schema.json'));
+        $reglas = json_decode($json_reglas_sat, true);
+
+        // Obtención del parametro hora y fecha
+        $parts = explode('-', $yearAndMonth);
+        $year = $parts[0];
+        $month = $parts[1];
+
+        if($tipoDM == 0){
+            return $this->generarReporteMensual($idPlanta, $year, $month);
+            
+        }else if($tipoDM == 1){
+            return $this->generarReportesDiarios($idPlanta, $year, $month);
+        }else{
+            $reportes = [
+                "MENSUALES" => $this->generarReporteMensual($idPlanta, $year, $month),
+                "DIARIOS" => $this->generarReportesDiarios($idPlanta, $year, $month)
+            ];
+            return $reportes;
+        }
+    }
+
+    
 }

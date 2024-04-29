@@ -10,10 +10,10 @@ class BitacoraEventosController extends Controller
          /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index($idPlanta)
     {
         try {
-            $data = BitacoraEventos::get();
+            $data = BitacoraEventos::where('id_planta', $idPlanta)->get();
             return  response()->json($data);
         } catch (\Throwable $th) {
             return response()->json([ 'error' => $th->getMessage() ], 500);
@@ -26,7 +26,15 @@ class BitacoraEventosController extends Controller
     public function store(Request $request)
     {
         try {
-            $data["nombre_planta"] = $request["nombre_planta"];
+
+            $data["id_planta"] = $request["id_planta"];
+
+            $data["NumeroRegistro"] = $request["NumeroRegistro"];
+            $data["FechaYHoraEvento"] = $request["FechaYHoraEvento"];
+            $data["UsuarioResponsable"] = $request["UsuarioResponsable"];
+            $data["TipoEvento"] = $request["TipoEvento"];
+            $data["DescripcionEvento"] = $request["DescripcionEvento"];
+            $data["IdentificacionComponenteAlarma"] = $request["IdentificacionComponenteAlarma"];
 
             $res = BitacoraEventos::create($data);
             return response()->json($res, 200);
@@ -54,7 +62,12 @@ class BitacoraEventosController extends Controller
     public function update(Request $request, BitacoraEventos $bitacoraEventos)
     {
         try {
-            $data["nombre_planta"] = $request["nombre_planta"];
+            $data["NumeroRegistro"] = $request["NumeroRegistro"];
+            $data["FechaYHoraEvento"] = $request["FechaYHoraEvento"];
+            $data["UsuarioResponsable"] = $request["UsuarioResponsable"];
+            $data["TipoEvento"] = $request["TipoEvento"];
+            $data["DescripcionEvento"] = $request["DescripcionEvento"];
+            $data["IdentificacionComponenteAlarma"] = $request["IdentificacionComponenteAlarma"];
 
             BitacoraEventos::find($request->id)->update($data);
             $res = BitacoraEventos::find($request->id);
