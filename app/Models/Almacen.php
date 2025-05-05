@@ -28,4 +28,14 @@ class Almacen extends Model
     {
         return $this->hasMany(RegistroLlenadoAlmacen::class, 'id_almacen', 'id');
     }
+    
+    public function registrosEventos()
+    {
+        return $this->hasMany(EventoAlmacen::class, 'id_almacen', 'id');
+    }
+
+    public function registrosExistencia()
+    {
+        return $this->hasMany(ExistenciaAlmacen::class, 'id_almacen', 'id');
+    }
 }

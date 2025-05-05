@@ -17,6 +17,8 @@ use App\Http\Controllers\PlantaGasController;
 use App\Http\Controllers\AlmacenController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\BitacoraEventosController;
+use App\Http\Controllers\EventoAlmacenController;
+use App\Http\Controllers\ExistenciaAlmacenController;
 
 // Rutas publicas para acceder o registrar una cuenta
 Route::controller(LoginRegisterController::class)->group(function() {
@@ -146,6 +148,22 @@ Route::middleware('auth:sanctum')->group( function () {
         Route::post('/v1/bitacoraEventos', 'store');
         Route::post('/v1/bitacoraEventos/{id}', 'update');
         Route::delete('/v1/bitacoraEventos/{id}', 'destroy');
+    });
+
+    Route::controller(EventoAlmacenController::class)->group(function() {
+        Route::get('/v1/eventoAlmacen/{idPlanta}', 'index');
+        Route::get('/v1/eventoAlmacen/{idPlanta}/{id}', 'show');
+        Route::post('/v1/eventoAlmacen', 'store');
+        Route::post('/v1/eventoAlmacen/{id}', 'update');
+        Route::delete('/v1/eventoAlmacen/{id}', 'destroy');
+    });
+
+    Route::controller(ExistenciaAlmacenController::class)->group(function() {
+        Route::get('/v1/existenciaAlmacen/{idPlanta}', 'index');
+        Route::get('/v1/existenciaAlmacen/{idPlanta}/{id}', 'show');
+        Route::get('/v1/existenciaAlmacen/verificar/{id}', 'verificar');
+        Route::post('/v1/existenciaAlmacen', 'store');
+        Route::post('/v1/existenciaAlmacen/{id}', 'update');
     });
     
 });
